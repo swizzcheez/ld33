@@ -1,0 +1,52 @@
+
+gateway:
+    extends:
+        file: "dc-common.yml"
+        service: "gateway"
+    ports:
+        - "0.0.0.0:5000:80"
+    volumes:
+        - "./svc/gateway/nginx.conf:/etc/nginx/nginx.conf"
+    links:
+        - "ui"
+        - "scoresvc"
+
+ui:
+    extends:
+        file: "dc-common.yml"
+        service: "ui"
+    volumes:
+        - "../ui/:/opt/ui/"
+    ports:
+        - "0.0.0.0:5000:5000"
+    environment:
+        SECRET_KEY: 'NOT_SO_SECRET'
+    command:
+        - "--debug"
+        - "run"
+        - "--host"
+        - "0.0.0.0"
+
+scoresvc:
+    extends:
+        file: "dc-common.yml"
+        service: "scoresvc"
+    volumes:
+        - "./scoresvc/:/opt/scoresvc/"
+    links:
+        - "gamedb"
+    command:
+        - "--debug"
+        - "run"
+        - "--host"
+        - "0.0.0.0"
+
+gamedb:
+    extends:
+        file: "dc-common.yml"
+        service: "gamedb"
+    volumes:
+        - "./docker/data/db/gamedb/:/data"
+    ports:
+        - "0.0.0.0:8080:8080"
+

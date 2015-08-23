@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html ng-app='LD33'>
+<head>
+    <title>LD 33</title>
+    <link rel='stylesheet' href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css'>
+    <link rel='stylesheet' href='{{ url_for("static", filename="site/ld33.css") }}'>
+    <script src='https://code.jquery.com/jquery-2.1.4.min.js'></script>
+    <script src='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js'></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.14/angular-resource.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+    <script src='{{ url_for("static", filename="site/ld33.js") }}'></script>
+    <script src='{{ url_for("static", filename="site/clock.js") }}'></script>
+    <script src='{{ url_for("static", filename="site/keyboard.js") }}'></script>
+    <script>
+    angular.module('LD33')
+
+    .constant('SESSION_ID', '{{ session.id }}')
+    .constant('TPL_BASE', '{{ url_for("static", filename="ng-tpl/") }}')
+    .constant('SCORESVC_URL', '{{ url_for("scoresvc", _external=True) }}')
+
+    ; // END OF MODULE CONFIG
+    </script>
+</head>
+<body class='container' keyhandler>
+    <div ui-view></div>
+</body>
+</html>

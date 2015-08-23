@@ -1,0 +1,10 @@
+FROM python:3.5
+MAINTAINER Rich Harkins <rich.harkins@gmail.com>
+
+WORKDIR /opt/gamelistsvc/
+RUN pip install --upgrade pip 
+ADD requirements.txt ./
+RUN pip install -r requirements.txt 
+ADD ./ ./
+ENTRYPOINT [ "python3.5", "app.py" ]
+EXPOSE 8675

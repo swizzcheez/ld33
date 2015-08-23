@@ -1,0 +1,25 @@
+
+gateway:
+    extends:
+        file: "docker/dc-common.yml"
+        service: "gateway"
+    ports:
+        - "0.0.0.0:80:80"
+
+ui:
+    extends:
+        file: "docker/dc-common.yml"
+        service: "ui"
+
+scoresvc:
+    extends:
+        file: "docker/dc-common.yml"
+        service: "ui"
+    links:
+        - "gamedb"
+
+gamedb:
+    extends:
+        file: "docker/dc-common.yml"
+        service: "gamedb"
+

@@ -1,0 +1,27 @@
+
+gateway:
+    build: svc/gateway
+
+ui:
+    build: ../ui
+    environment:
+        - "SECRET_KEY"
+    command:
+        - "run"
+        - "--host"
+        - "0.0.0.0"
+
+scoresvc:
+    build: ../scoresvc
+    environment:
+        - "SECRET_KEY"
+    command:
+        - "run"
+        - "--host"
+        - "0.0.0.0"
+
+gamedb:
+    image: rethinkdb
+    expose:
+        - "28015"
+

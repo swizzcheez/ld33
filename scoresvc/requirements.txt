@@ -1,0 +1,3 @@
+https://github.com/mitsuhiko/flask/archive/master.zip
+Flask-Restful
+flask_rethinkdb
