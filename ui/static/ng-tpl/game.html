@@ -1,13 +1,19 @@
 <div ld33-game>
     <div on-key
-         key-left='game.player.turnLeft()'
-         key-right='game.player.turnRight()'
-         key-up='game.player.surface()'
-         key-down='game.player.dive()'
+         key-left='game.player.turnWest()'
+         key-right='game.player.turnEast()'
+         key-up='game.player.turnNorth()'
+         key-down='game.player.turnSouth()'
+         key-space='game.svc.start()'
+         key-s='game.player.surface()'
+         key-d='game.player.dive()'
     ></div>
-    <div class='alert alert-success row'>
+    <div class='alert alert-warning row' ng-if='game.svc.prestart'>
+        Click in window and press SPACE to start. 
+    </div>
+    <div class='alert alert-success row' ng-if='!game.svc.prestart'>
         <div class='row'>
-            <div class='col-md-5'>
+            <div class='col-md-3'>
                 <span ng-bind='game.svc.cause_of_death'></span>
                 <div ng-if='! game.svc.cause_of_death' class='progress'>
                     <div class='progress-bar'
@@ -16,7 +22,15 @@
                     </div>
                 </div>
             </div>
-            <div class='col-md-5'>
+            <div class='col-md-3'>
+                <div class='progress'>
+                    <div class='progress-bar'
+                        ng-style='{ width: game.player.air + "%" }'>
+                        <span>Air</span>
+                    </div>
+                </div>
+            </div>
+            <div class='col-md-3'>
                 <div class='progress'>
                     <div class='progress-bar'
                         ng-style='{ width: game.player.hunger + "%" }'>
@@ -24,7 +38,7 @@
                     </div>
                 </div>
             </div>
-            <div class='col-md-2'>
+            <div class='col-md-3'>
                 <span ng-bind='game.svc.score'></span>
                 <button ng-click='game.reset()'
                         ng-if='game.svc.cause_of_death'
@@ -32,57 +46,75 @@
             </div>
         </div>
     </div>
-    <svg ng-style='{
-            width: game.ocean.width * 20,
-            height: game.ocean.height * 20
-         }'>
-        <g opacity='0.25'>
-            <rect x='0' y='0' width='100%' height='100%' fill='blue' />
-            <g transform='scale(20, 20)'>
-                <g transform='translate(0.5, 0.5)'>
-                    <g ng-repeat='segment in game.player.segments'
-                       sprite='segment' ng-if='segment.view.depth == 1'>
-                       <rect x=-1 y=-1 width=2 height=2 fill=lime/>
+    <div class='row'>
+        <div class='col-md-9'>
+            <svg ng-style='{
+                    width: game.ocean.width * 20,
+                    height: game.ocean.height * 20
+                 }'>
+                <g opacity='0.25'>
+                    <rect x='0' y='0' width='100%' height='100%' fill='blue' />
+                    <g transform='scale(20, 20)'>
+                        <g transform='translate(0.5, 0.5)'>
+                            <g ng-repeat='segment in game.player.segments'
+                               sprite='segment' ng-if='segment.view.depth == 1'>
+                               <rect x=-1 y=-1 width=2 height=2 fill=lime/>
+                            </g>
+                            <g sprite='game.player.head' 
+                               ng-if='game.player.head.view.depth == 1'>
+                                <g ng-include='sprite.include'/>
+                            </g>
+                        </g>
                     </g>
-                    <g sprite='game.player.head' 
-                       ng-if='game.player.head.view.depth == 1'>
-                        <g ng-include='sprite.include'/>
+                    <g opacity='0.2'>
+                        <rect x='0' y='0' 
+                              width='100%' height='100%' fill='blue' />
+                        <g transform='scale(20, 20)'>
+                            <g transform='translate(0.5, 0.5)'>
+                                <g ng-repeat='segment in game.player.segments'
+                                   sprite='segment' 
+                                   ng-if='segment.view.depth == 2'>
+                                   <rect x=-1 y=-1 width=2 height=2 fill=lime/>
+                                </g>
+                                <g sprite='game.player.head' 
+                                   ng-if='game.player.head.view.depth == 2'>
+                                    <g ng-include='sprite.include'/>
+                                </g>
+                            </g>
+                        </g>
                     </g>
                 </g>
-            </g>
-            <g opacity='0.2'>
-                <rect x='0' y='0' width='100%' height='100%' fill='blue' />
                 <g transform='scale(20, 20)'>
                     <g transform='translate(0.5, 0.5)'>
+                        <g ng-repeat='(id, boat) in game.boats' 
+                           sprite='boat.sprite'>
+                           <g ng-include='"boat"' ng-if='! sprite.destroyed'/>
+                        </g>
                         <g ng-repeat='segment in game.player.segments'
-                           sprite='segment' ng-if='segment.view.depth == 2'>
+                           sprite='segment' ng-if='segment.view.depth == 0'>
                            <rect x=-1 y=-1 width=2 height=2 fill=lime/>
                         </g>
                         <g sprite='game.player.head' 
-                           ng-if='game.player.head.view.depth == 2'>
+                           ng-if='game.player.head.view.depth == 0'>
                             <g ng-include='sprite.include'/>
                         </g>
                     </g>
                 </g>
-            </g>
-        </g>
-        <g transform='scale(20, 20)'>
-            <g transform='translate(0.5, 0.5)'>
-                <g ng-repeat='(id, boat) in game.boats' sprite='boat.sprite'>
-                   <g ng-include='"boat"' ng-if='! sprite.destroyed'/>
-                </g>
-                <g ng-repeat='segment in game.player.segments'
-                   sprite='segment' ng-if='segment.view.depth == 0'>
-                   <rect x=-1 y=-1 width=2 height=2 fill=lime/>
-                </g>
-                <g sprite='game.player.head' 
-                   ng-if='game.player.head.view.depth == 0'>
-                    <g ng-include='sprite.include'/>
-                </g>
-            </g>
-        </g>
-    </svg>
+            </svg>
+        </div>
+        <div class='col-md-3'>
+            <h2>Instructions</h2>
+            <h4>
+            Guide Nessie and her giant tail around the loch using arrow
+            keys.  Dive using "d" and surface using "s", but be careful
+            not to run out of air.  Avoid boats slamming into parts of your
+            tail (ouch).  Instead, eat boats for points and to relieve
+            hunger.  Eating boats makes Nessie grow longer, but biting
+            one's tail spells game over.
+        </h4>
 
+        </div>
+    </div>
 </div>
 
 <script type='text/ng-template' id='boat'>

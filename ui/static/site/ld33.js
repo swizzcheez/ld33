@@ -11,7 +11,7 @@ function($stateProvider, $urlRouterProvider, TPL_BASE)
 {
 
     // Starting state
-    $urlRouterProvider.otherwise('/')
+    $urlRouterProvider.otherwise('/game/')
 
     // States
     $stateProvider
@@ -70,14 +70,24 @@ function(GameClockSvc, ActionClockSvc)
 {
     this.gameclock = GameClockSvc
     this.actionclock = ActionClockSvc
+    this.prestart = true
     this.score = 0
+
+    this.reset = function()
+    {
+        this.prestart = true
+    }
 
     this.start = function()
     {
-        GameClockSvc.reset()
-        ActionClockSvc.reset().start()
-        this.score = 0
-        this.cause_of_death = null
+        if (this.prestart)
+        {
+            this.prestart = false
+            GameClockSvc.reset().start()
+            ActionClockSvc.reset().start()
+            this.score = 0
+            this.cause_of_death = null
+        }
         return this
     }
 
@@ -97,15 +107,15 @@ function(Serpent, Ocean, GameSvc, BoatLaunchSvc)
     // Holds the models used in the game
     this.gameclock = GameSvc.gameclock
     this.actionclock = GameSvc.actionclock
-    this.ocean = new Ocean(51, 41)
+    this.ocean = new Ocean(41, 31)
     this.player = new Serpent(this.ocean)
     var boat_svc = BoatLaunchSvc(this.player, this.ocean)
     this.boats = boat_svc.boats
+    this.svc = GameSvc
 
     this.reset = function()
     {
         this.player.reset()
-        this.svc = GameSvc.start()
         boat_svc.reset()
     }
 
@@ -153,7 +163,7 @@ function(ActionClockSvc, Boat)
 ['GameClock',
 function(GameClock)
 {
-    return new GameClock(6)     // actions / second
+    return new GameClock(13)     // actions / second
 }])
 
 //////////////////////////////////////////////////////////////////////////////
@@ -242,8 +252,8 @@ function(ActionClockSvc)
             if (this.speed)
             {
                 var rad = (this.r - 90) * Math.PI / 180
-                this.x += Math.cos(rad) * this.speed
-                this.y += Math.sin(rad) * this.speed
+                this.x += Math.round(Math.cos(rad) * this.speed)
+                this.y += Math.round(Math.sin(rad) * this.speed)
             }
 
             this.view.x = this.x
@@ -309,7 +319,7 @@ function(GameSvc, Sprite)
                 || serpent.head.x >= serpent.ocean.width
                 || serpent.head.y >= serpent.ocean.height)
             {
-                GameSvc.end("Have to stay in the water!")
+                GameSvc.end("Stay inside the loch!")
             }
 
             // Did we eat our own tail?
@@ -330,7 +340,7 @@ function(GameSvc, Sprite)
                 serpent.hunger += serpent.tail_length / 50
                 if (serpent.health < serpent.max_health)
                 {
-                    serpent.health += 0.05
+                    serpent.health += 0.1
                 }
             }
             else
@@ -340,6 +350,24 @@ function(GameSvc, Sprite)
                 {
                     GameSvc.end('Died from hunger')
                 }
+            }
+
+            if (serpent.head.depth > 0)
+            {
+                serpent.air = 
+                    Math.max(0, serpent.air - serpent.head.depth / 3.0)
+                if (serpent.air < 25)
+                {
+                    serpent.health -= 0.5
+                }
+                if (serpent.health < 0)
+                {
+                    GameSvc.end('Died of asphyxiation!')
+                }
+            }
+            else
+            {
+                serpent.air = Math.min(100, serpent.air + 1)
             }
 
             GameSvc.score += 1
@@ -389,6 +417,7 @@ function(GameSvc, Sprite)
             this.health = 20
             this.max_health = 20
             this.hunger = 0
+            this.air = 100
         },
 
         turnLeft: function()
@@ -399,6 +428,38 @@ function(GameSvc, Sprite)
         turnRight: function()
         {
             this.head.sdr = 90
+        },
+
+        turnNorth: function()
+        {
+            if (this.head.r != 180)
+            {
+                this.head.r = 0
+            }
+        },
+
+        turnEast: function()
+        {
+            if (this.head.r != 270)
+            {
+                this.head.r = 90
+            }
+        },
+
+        turnSouth: function()
+        {
+            if (this.head.r != 0)
+            {
+                this.head.r = 180
+            }
+        },
+
+        turnWest: function()
+        {
+            if (this.head.r != 90)
+            {
+                this.head.r = 270
+            }
         },
 
         dive: function()
@@ -437,6 +498,8 @@ function(GameSvc, Sprite)
 ['Sprite', 'GameSvc',
 function(Sprite, GameSvc)
 {
+    var timers = window.timers = {}
+
     function Boat(id, boats, player, ocean)
     {
         var boat = this
@@ -475,6 +538,7 @@ function(Sprite, GameSvc)
                 return;
             }
 
+            timers[id] = 1 + (timers[id] || 0)
             var head = player.head
             var bs = boat.sprite
             if (player.head.depth == 0
@@ -484,6 +548,7 @@ function(Sprite, GameSvc)
                 boat.destroy()
                 player.hunger = 0
                 player.tail_length = parseInt(player.tail_length * 1.25)
+                player.max_health += 3
                 GameSvc.score += 1000
             }
 

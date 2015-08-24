@@ -29,10 +29,16 @@ function($compile)
 {
     var keyCodes = 
     {
+        Space: 32,
         Left: 37,
         Up: 38,
         Right: 39,
-        Down: 40
+        Down: 40,
+    }
+
+    for (var i = 48; i <= 90; ++i)
+    {
+        keyCodes[String.fromCharCode(i)] = i
     }
 
     return {
