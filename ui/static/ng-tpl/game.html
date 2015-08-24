@@ -56,6 +56,12 @@
                     <rect x='0' y='0' width='100%' height='100%' fill='blue' />
                     <g transform='scale(20, 20)'>
                         <g transform='translate(0.5, 0.5)'>
+                            <g ng-repeat='(id, boat) in game.boats' 
+                               ng-if='boat.sprite.depth == 1'
+                               sprite='boat.sprite'>
+                               <g ng-include='"shark"' 
+                                  ng-if='! sprite.destroyed'/>
+                            </g>
                             <g ng-repeat='segment in game.player.segments'
                                sprite='segment' ng-if='segment.view.depth == 1'>
                                <rect x=-1 y=-1 width=2 height=2 fill=lime/>
@@ -71,6 +77,12 @@
                               width='100%' height='100%' fill='blue' />
                         <g transform='scale(20, 20)'>
                             <g transform='translate(0.5, 0.5)'>
+                                <g ng-repeat='(id, boat) in game.boats' 
+                                   ng-if='boat.sprite.depth == 2'
+                                   sprite='boat.sprite'>
+                                   <g ng-include='"octopus"' 
+                                      ng-if='! sprite.destroyed'/>
+                                </g>
                                 <g ng-repeat='segment in game.player.segments'
                                    sprite='segment' 
                                    ng-if='segment.view.depth == 2'>
@@ -87,6 +99,7 @@
                 <g transform='scale(20, 20)'>
                     <g transform='translate(0.5, 0.5)'>
                         <g ng-repeat='(id, boat) in game.boats' 
+                           ng-if='boat.sprite.depth == 0'
                            sprite='boat.sprite'>
                            <g ng-include='"boat"' ng-if='! sprite.destroyed'/>
                         </g>
@@ -107,10 +120,13 @@
             <h4>
             Guide Nessie and her giant tail around the loch using arrow
             keys.  Dive using "d" and surface using "s", but be careful
-            not to run out of air.  Avoid boats slamming into parts of your
-            tail (ouch).  Instead, eat boats for points and to relieve
-            hunger.  Eating boats makes Nessie grow longer, but biting
-            one's own tail spells game over.
+            not to run out of air.  Avoid boats on the surface, sharks
+            at depth 1, and octopi at depth 2 slamming into parts of your
+            tail (ouch).  Instead, eat them for points and to relieve
+            hunger (deeper targets mean more points).  Eating boats makes 
+            Nessie grow longer, but biting one's own tail spells game over.
+            </h4>
+
         </h4>
 
         </div>
@@ -119,6 +135,14 @@
 
 <script type='text/ng-template' id='boat'>
 <polygon points='0,-1 1,0 1,1 -1,1 -1,0' style='fill:red'/>
+</script>
+
+<script type='text/ng-template' id='shark'>
+<polygon points='0,-1 1,1 -1,1' style='fill:yellow'/>
+</script>
+
+<script type='text/ng-template' id='octopus'>
+<circle r=1 style='fill:white'/>
 </script>
 
 <script type='text/ng-template' id='serpent-head'>

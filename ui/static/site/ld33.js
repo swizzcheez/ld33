@@ -372,7 +372,7 @@ function(GameSvc, Sprite)
                 serpent.air = Math.min(100, serpent.air + 1)
             }
 
-            GameSvc.score += 1
+            GameSvc.score += parseInt(Math.log10(serpent.tail_length)) + 1
         })
 
         this.head = new Sprite(
@@ -524,12 +524,20 @@ function(Sprite, GameSvc)
             var r = dx > 0 ? 90 : 270
         }
 
+        var drand = Math.random()
+        var depth = drand < .1 ? 2 : drand < .4 ? 1 : 0
+
         this.sprite = new Sprite({
             x: x,
             y: y,
+            depth: depth,
             dx: dx,
             dy: dy,
             r: r,
+            before: function(view)
+            {
+                view.depth = this.depth
+            }
         })
 
         GameSvc.actionclock.on_cleanup(
@@ -543,7 +551,7 @@ function(Sprite, GameSvc)
             timers[id] = 1 + (timers[id] || 0)
             var head = player.head
             var bs = boat.sprite
-            if (player.head.depth == 0
+            if (player.head.depth == boat.sprite.depth
                 && ((bs.x - bs.dx == head.x && bs.y - bs.dy == head.y)
                     || (bs.x == head.x && bs.y == head.y)))
             {
@@ -551,7 +559,7 @@ function(Sprite, GameSvc)
                 player.hunger = 0
                 player.tail_length = parseInt(player.tail_length * 1.25)
                 player.max_health += 3
-                GameSvc.score += 1000
+                GameSvc.score += 1000 * Math.pow(boat.sprite.depth + 1, 2)
             }
 
             if (! boat.destroyed)
@@ -559,12 +567,12 @@ function(Sprite, GameSvc)
                 angular.forEach(player.segments,
                 function(segment)
                 {
-                    if (segment.view.depth == 0
+                    if (segment.view.depth == boat.sprite.depth 
                         && segment.view.x == bs.x
                         && segment.view.y == bs.y)
                     {
                         // Destroyed, but damages the player
-                        player.health -= 5
+                        player.health -= 5 * boat.sprite.depth
                         boat.destroy()
                     }
                 })
