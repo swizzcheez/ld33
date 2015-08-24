@@ -111,10 +111,12 @@ function(Serpent, Ocean, GameSvc, BoatLaunchSvc)
     this.player = new Serpent(this.ocean)
     var boat_svc = BoatLaunchSvc(this.player, this.ocean)
     this.boats = boat_svc.boats
+    this.powerups = 
     this.svc = GameSvc
 
     this.reset = function()
     {
+        GameSvc.reset()
         this.player.reset()
         boat_svc.reset()
     }
