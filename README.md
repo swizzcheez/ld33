@@ -23,3 +23,15 @@ Saturdady.
 
 So this is another LD in eight hour things...
 
+# What REALLY happened instead
+
+Ran out of time to do the scoring service.  Not sure if rules will let me
+tack it on later.  So the whole thing can be run by:
+
+ * cd ui
+ * ipp install -r requirements.txt (Use virtualenv if possible
+ * python ./app.py 
+
+
+
+
